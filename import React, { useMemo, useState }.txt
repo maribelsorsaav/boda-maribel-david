@@ -1,0 +1,520 @@
+import React, { useMemo, useState } from "react";
+
+const wedding = {
+  names: "Maribel & David",
+  dateLong: "13 de octubre de 2028",
+  dateDisplay: "13 | Octubre | 2028",
+  day: "Sábado",
+  time: "16:30 h",
+  venue: "Finca La Montaña",
+  city: "Aranjuez, Madrid",
+  rsvpDeadline: "15 de agosto",
+  mapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=Finca%20La%20Monta%C3%B1a%20Aranjuez%20Madrid",
+  hotelName: "Occidental Aranjuez",
+  hotelUrl: "https://www.barcelo.com/es-es/occidental-aranjuez/",
+  rsvpEmail: "maribel.sorsaav@gmail.com",
+};
+
+const faqs = [
+  {
+    q: "¿Tienes alguna alergia o intolerancia alimenticia?",
+    a: "Indícalo en el formulario de confirmación para que podamos tenerlo en cuenta en el banquete.",
+  },
+  {
+    q: "¿Hasta cuándo puedo confirmar mi asistencia?",
+    a: "Por favor, confirma antes del 15 de agosto para ayudarnos con la organización.",
+  },
+];
+
+function Icon({ type, className = "" }) {
+  const paths = {
+    calendar: (
+      <>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M16 3v4M8 3v4M3 11h18" />
+      </>
+    ),
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v6l4 2" />
+      </>
+    ),
+    map: (
+      <>
+        <path d="M12 21s7-5.2 7-11a7 7 0 0 0-14 0c0 5.8 7 11 7 11Z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </>
+    ),
+    shirt: <path d="M8 4 5 6.5 2 7l2 5 3-1v9h10v-9l3 1 2-5-3-.5L16 4l-4 2-4-2Z" />,
+    gift: (
+      <>
+        <rect x="3" y="8" width="18" height="13" rx="2" />
+        <path d="M12 8v13M3 12h18M7.5 8A2.5 2.5 0 1 1 12 6.5 2.5 2.5 0 1 1 16.5 8" />
+      </>
+    ),
+    check: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="m8 12 2.5 2.5L16 9" />
+      </>
+    ),
+    heart: <path d="M20.8 8.6c0 5.1-8.8 10.4-8.8 10.4S3.2 13.7 3.2 8.6A4.6 4.6 0 0 1 12 6a4.6 4.6 0 0 1 8.8 2.6Z" />,
+    chevron: <path d="m6 9 6 6 6-6" />,
+    car: (
+      <>
+        <path d="M5 17h14M6.5 17v2M17.5 17v2M5 14l1.7-5.2A2.5 2.5 0 0 1 9.1 7h5.8a2.5 2.5 0 0 1 2.4 1.8L19 14" />
+        <rect x="4" y="12" width="16" height="5" rx="2" />
+        <path d="M7 14h.01M17 14h.01" />
+      </>
+    ),
+    hotel: (
+      <>
+        <path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16" />
+        <path d="M16 9h2a2 2 0 0 1 2 2v10M8 7h.01M12 7h.01M8 11h.01M12 11h.01M8 15h.01M12 15h.01M3 21h18" />
+      </>
+    ),
+    external: (
+      <>
+        <path d="M14 3h7v7" />
+        <path d="M10 14 21 3" />
+        <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {paths[type]}
+    </svg>
+  );
+}
+
+function Card({ children, className = "" }) {
+  return <div className={className}>{children}</div>;
+}
+
+function FaqItem({ item }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Card className="overflow-hidden rounded-2xl border border-[#d7d0bd] bg-[#fbf8ef]/80 shadow-sm">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+      >
+        <span className="font-serif text-lg text-[#2f352c]">{item.q}</span>
+        <Icon
+          type="chevron"
+          className={`h-5 w-5 shrink-0 text-[#596048] transition ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      {open && (
+        <div className="px-5 pb-5 text-sm leading-7 text-[#5c5f55]">
+          {item.a}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function DetailCard({ icon, title, text }) {
+  return (
+    <Card className="rounded-3xl border border-[#d7d0bd] bg-[#fbf8ef] shadow-sm">
+      <div className="p-6 text-center">
+        <Icon type={icon} className="mx-auto mb-4 h-7 w-7 text-[#596048]" />
+        <p className="text-xs uppercase tracking-[0.25em] text-[#777b6b]">
+          {title}
+        </p>
+        <p className="mt-3 font-serif text-xl">{text}</p>
+      </div>
+    </Card>
+  );
+}
+
+export default function WeddingWebsite() {
+  const [form, setForm] = useState({
+    nombre: "",
+    asistencia: "sí",
+    acompanantes: "0",
+    alergias: "",
+    mensaje: "",
+  });
+
+  const [status, setStatus] = useState(null);
+
+  const calendarUrl = useMemo(() => {
+    const title = encodeURIComponent("Boda de Maribel y David");
+    const details = encodeURIComponent(
+      "Ceremonia y recepción a seguir. Código de vestimenta: formal."
+    );
+    const location = encodeURIComponent(`${wedding.venue}, ${wedding.city}`);
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=20281013T143000Z/20281013T220000Z&details=${details}&location=${location}`;
+  }, []);
+
+  const handleSubmit = (e) => {
+    if (!form.nombre.trim()) {
+      e.preventDefault();
+      setStatus({
+        ok: false,
+        message: "Por favor, indica tu nombre completo.",
+      });
+      return;
+    }
+
+    setStatus({
+      ok: true,
+      message: "Enviando confirmación...",
+    });
+  };
+
+  return (
+    <main className="min-h-screen bg-[#eeeadf] text-[#30372f]">
+      <section className="relative overflow-hidden border-b-[18px] border-[#596048] bg-[#f8f4ea] px-6 py-16 text-center">
+        <div className="absolute -right-12 -top-8 h-56 w-56 rounded-full border border-[#a1a88e]/50" />
+        <div className="absolute left-6 top-8 text-[#7b8367]/50">✦</div>
+
+        <div className="mx-auto max-w-3xl">
+          <p className="mb-8 text-xs uppercase tracking-[0.38em] text-[#596048]">
+            Con gran alegría te invitamos a
+          </p>
+          <p className="mb-4 text-sm uppercase tracking-[0.32em]">
+            Nuestra boda
+          </p>
+
+          <h1 className="font-serif text-6xl uppercase tracking-[0.22em] sm:text-8xl">
+            Maribel
+          </h1>
+          <p className="my-2 font-serif text-5xl italic text-[#6b7357]">y</p>
+          <h1 className="font-serif text-6xl uppercase tracking-[0.22em] sm:text-8xl">
+            David
+          </h1>
+
+          <div className="mx-auto my-10 h-px w-72 bg-[#9aa184]" />
+
+          <p className="text-sm uppercase tracking-[0.34em]">{wedding.day}</p>
+          <p className="mt-3 font-serif text-3xl uppercase tracking-[0.22em]">
+            {wedding.dateDisplay}
+          </p>
+          <p className="mt-4 text-sm uppercase tracking-[0.25em]">
+            A las 16:30 hrs
+          </p>
+
+          <div className="mt-10 inline-block rounded-full bg-[#c49b45] px-6 py-4 font-serif text-2xl text-[#2d2a20] shadow-lg">
+            M&amp;D
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-6xl gap-5 px-6 py-10 md:grid-cols-4">
+        <DetailCard icon="calendar" title="Fecha" text={wedding.dateLong} />
+        <DetailCard icon="clock" title="Hora" text={wedding.time} />
+        <DetailCard
+          icon="map"
+          title="Lugar"
+          text={`${wedding.venue}, ${wedding.city}`}
+        />
+        <DetailCard icon="shirt" title="Dress code" text="Formal" />
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 py-8 text-center">
+        <h2 className="font-serif text-4xl uppercase tracking-[0.18em]">
+          Detalles importantes
+        </h2>
+
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          <Card className="rounded-3xl bg-[#596048] text-white shadow-md">
+            <div className="p-6">
+              <Icon type="gift" className="mx-auto mb-4 h-7 w-7" />
+              <p className="text-sm uppercase tracking-[0.2em]">Regalo</p>
+              <p className="mt-3 text-sm leading-7">
+                Nuestro mejor regalo es vuestra presencia.
+              </p>
+            </div>
+          </Card>
+
+          <Card className="rounded-3xl bg-[#fbf8ef] shadow-md">
+            <div className="p-6">
+              <Icon
+                type="check"
+                className="mx-auto mb-4 h-7 w-7 text-[#596048]"
+              />
+              <p className="text-sm uppercase tracking-[0.2em]">
+                Confirmación
+              </p>
+              <p className="mt-3 text-sm leading-7">
+                Confirmad antes del {wedding.rsvpDeadline}.
+              </p>
+            </div>
+          </Card>
+
+          <Card className="rounded-3xl bg-[#596048] text-white shadow-md">
+            <div className="p-6">
+              <Icon type="heart" className="mx-auto mb-4 h-7 w-7" />
+              <p className="text-sm uppercase tracking-[0.2em]">Recepción</p>
+              <p className="mt-3 text-sm leading-7">
+                Recepción a seguir tras la ceremonia.
+              </p>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 py-6">
+        <div className="rounded-[2rem] border border-[#d7d0bd] bg-gradient-to-br from-[#fbf8ef] to-[#f3eee0] p-8 shadow-sm">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-xs uppercase tracking-[0.35em] text-[#7b8367]">
+              Con mucho cariño
+            </p>
+            <h3 className="mt-4 font-serif text-3xl uppercase tracking-[0.18em] text-[#2f352c]">
+              Lluvia de sobres
+            </h3>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-8 text-[#5c5f55]">
+              Vuestra presencia será nuestro mejor regalo. Si además deseáis
+              tener un detalle con nosotros, podéis hacerlo mediante
+              transferencia bancaria al siguiente número de cuenta.
+            </p>
+
+            <div className="mx-auto mt-8 inline-block rounded-2xl border border-[#cfc7b4] bg-white px-8 py-5 shadow-inner">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#8a907f]">
+                IBAN
+              </p>
+              <p className="mt-2 font-serif text-2xl tracking-[0.18em] text-[#3d4337]">
+                ES76 2100 4587 4502 0005 1332
+              </p>
+            </div>
+
+            <p className="mt-5 text-xs italic tracking-[0.08em] text-[#8a907f]">
+              Titulares: Maribel & David
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 py-8 text-center">
+        <h2 className="font-serif text-4xl uppercase tracking-[0.18em]">
+          Cómo llegar y alojamiento
+        </h2>
+
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#5c5f55]">
+          Para que vuestra llegada sea cómoda, os dejamos la ubicación directa,
+          información de parking y una opción cercana de alojamiento.
+        </p>
+
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          <Card className="rounded-3xl border border-[#d7d0bd] bg-[#fbf8ef] shadow-sm">
+            <div className="p-6">
+              <Icon
+                type="map"
+                className="mx-auto mb-4 h-7 w-7 text-[#596048]"
+              />
+              <p className="text-sm uppercase tracking-[0.2em]">Dirección</p>
+              <p className="mt-3 text-sm leading-7 text-[#5c5f55]">
+                Finca La Montaña, Aranjuez, Madrid.
+              </p>
+
+              <a
+                href={wedding.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#596048] px-5 py-3 text-xs uppercase tracking-[0.18em] text-[#596048] hover:bg-[#596048] hover:text-white"
+              >
+                Cómo llegar <Icon type="external" className="h-4 w-4" />
+              </a>
+            </div>
+          </Card>
+
+          <Card className="rounded-3xl border border-[#d7d0bd] bg-[#fbf8ef] shadow-sm">
+            <div className="p-6">
+              <Icon
+                type="car"
+                className="mx-auto mb-4 h-7 w-7 text-[#596048]"
+              />
+              <p className="text-sm uppercase tracking-[0.2em]">Parking</p>
+              <p className="mt-3 text-sm leading-7 text-[#5c5f55]">
+                Existe aparcamiento disponible en los alrededores de la finca
+                para mayor comodidad de los invitados.
+              </p>
+            </div>
+          </Card>
+
+          <Card className="rounded-3xl border border-[#d7d0bd] bg-[#fbf8ef] shadow-sm">
+            <div className="p-6">
+              <Icon
+                type="hotel"
+                className="mx-auto mb-4 h-7 w-7 text-[#596048]"
+              />
+              <p className="text-sm uppercase tracking-[0.2em]">
+                Hotel cercano
+              </p>
+              <p className="mt-3 text-sm leading-7 text-[#5c5f55]">
+                Hotel recomendado: {wedding.hotelName}, una opción cercana para
+                quienes quieran alojarse en la zona.
+              </p>
+
+              <a
+                href={wedding.hotelUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#596048] px-5 py-3 text-xs uppercase tracking-[0.18em] text-[#596048] hover:bg-[#596048] hover:text-white"
+              >
+                Sitio web <Icon type="external" className="h-4 w-4" />
+              </a>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-3xl px-6 py-10 text-center">
+        <h2 className="font-serif text-4xl uppercase tracking-[0.18em]">
+          Confirma tu asistencia
+        </h2>
+
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#5c5f55]">
+          Rellena este formulario para confirmar si podrás acompañarnos y
+          contarnos cualquier detalle importante para el banquete.
+        </p>
+
+        <form
+          name="confirmacion-boda-maribel-david"
+          method="POST"
+          action="https://formsubmit.co/maribel.sorsaav@gmail.com"
+          onSubmit={handleSubmit}
+          className="mt-8 grid gap-4 rounded-3xl border border-[#d7d0bd] bg-[#fbf8ef] p-6 text-left shadow-sm"
+        >
+          <input
+            type="hidden"
+            name="_subject"
+            value="Nueva confirmación boda Maribel y David"
+          />
+          <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="_captcha" value="false" />
+
+          <label className="text-xs uppercase tracking-[0.22em] text-[#596048]">
+            Nombre completo
+            <input
+              name="Nombre"
+              required
+              value={form.nombre}
+              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+              className="mt-2 w-full rounded-xl border border-[#d7d0bd] bg-white px-4 py-3 text-base normal-case tracking-normal outline-none focus:border-[#596048]"
+            />
+          </label>
+
+          <label className="text-xs uppercase tracking-[0.22em] text-[#596048]">
+            ¿Asistirás?
+            <select
+              name="Asistencia"
+              value={form.asistencia}
+              onChange={(e) =>
+                setForm({ ...form, asistencia: e.target.value })
+              }
+              className="mt-2 w-full rounded-xl border border-[#d7d0bd] bg-white px-4 py-3 text-base normal-case tracking-normal outline-none focus:border-[#596048]"
+            >
+              <option value="sí">Sí, asistiré</option>
+              <option value="no">No podré asistir</option>
+            </select>
+          </label>
+
+          <label className="text-xs uppercase tracking-[0.22em] text-[#596048]">
+            Número de acompañantes
+            <input
+              name="Acompañantes"
+              type="number"
+              min="0"
+              value={form.acompanantes}
+              onChange={(e) =>
+                setForm({ ...form, acompanantes: e.target.value })
+              }
+              className="mt-2 w-full rounded-xl border border-[#d7d0bd] bg-white px-4 py-3 text-base normal-case tracking-normal outline-none focus:border-[#596048]"
+            />
+          </label>
+
+          <label className="text-xs uppercase tracking-[0.22em] text-[#596048]">
+            Alergias o intolerancias alimenticias
+            <textarea
+              name="Alergias o intolerancias"
+              value={form.alergias}
+              onChange={(e) => setForm({ ...form, alergias: e.target.value })}
+              placeholder="Ej.: gluten, lactosa, frutos secos..."
+              className="mt-2 min-h-24 w-full rounded-xl border border-[#d7d0bd] bg-white px-4 py-3 text-base normal-case tracking-normal outline-none focus:border-[#596048]"
+            />
+          </label>
+
+          <label className="text-xs uppercase tracking-[0.22em] text-[#596048]">
+            Mensaje para los novios, opcional
+            <textarea
+              name="Mensaje"
+              value={form.mensaje}
+              onChange={(e) => setForm({ ...form, mensaje: e.target.value })}
+              className="mt-2 min-h-24 w-full rounded-xl border border-[#d7d0bd] bg-white px-4 py-3 text-base normal-case tracking-normal outline-none focus:border-[#596048]"
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="mt-2 rounded-2xl bg-[#596048] px-5 py-4 text-sm uppercase tracking-[0.18em] text-white shadow-md hover:bg-[#464d39]"
+          >
+            Enviar confirmación
+          </button>
+
+          {status && (
+            <p
+              className={`rounded-2xl p-4 text-center text-sm ${
+                status.ok
+                  ? "bg-[#eef0e8] text-[#596048]"
+                  : "bg-red-50 text-red-700"
+              }`}
+            >
+              {status.message}
+            </p>
+          )}
+        </form>
+
+        <a
+          href={calendarUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-[#596048] underline underline-offset-4"
+        >
+          Añadir al calendario
+        </a>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-6 py-12">
+        <h2 className="mb-8 text-center font-serif text-4xl uppercase tracking-[0.18em]">
+          Información útil
+        </h2>
+
+        <div className="grid gap-3">
+          {faqs.map((item) => (
+            <FaqItem key={item.q} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <footer className="bg-[#596048] px-6 py-10 text-center text-[#f8f4ea]">
+        <p className="font-serif text-3xl uppercase tracking-[0.2em]">
+          Maribel & David
+        </p>
+        <p className="mt-3 text-xs uppercase tracking-[0.25em]">
+          13 octubre 2028 · Finca La Montaña · Aranjuez, Madrid
+        </p>
+      </footer>
+    </main>
+  );
+}
